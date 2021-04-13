@@ -2,37 +2,77 @@
   <div class="login-border">
     <div class="login-back">
       <div class="login-box">
-        <span class="md-headline">Welcome</span>
-        <md-field :class="validation">
-          <label>Username</label>
-          <md-input v-model="username"></md-input>
-          <span class="md-error">{{ validationMessage }}</span>
-        </md-field>
-        <br />
-        <md-button class="md-fab login-button" v-on:click="submit()">
-          <md-icon> arrow_forward_ios</md-icon>
-        </md-button>
+        <div id="login-input">
+          <span class="md-headline">Welcome</span><br /><br />
+          <md-field :class="validation">
+            <label>Username</label>
+            <md-input v-model="username"></md-input>
+            <span class="md-error">{{ validationMessage }}</span>
+          </md-field>
+          <br />
+          <br />
+          <md-button class="md-fab login-button" v-on:click="submit()">
+            <md-icon> arrow_forward_ios</md-icon>
+          </md-button>
+        </div>
+        <md-dialog :md-active.sync="showDialog">
+          <md-tabs md-dynamic-height>
+            <md-tab md-label="Credit" id="credit-content">
+              <p>
+                This project is created by Leyi Sun & Yijian Liu<br />
+                For Computer Networking Spring 2021 <br /><br />
+                Source:
+                <a href="https://github.com/yjl450/networking-project"
+                  >github.com/yjl450/networking-project</a
+                >
+              </p>
+            </md-tab>
+          </md-tabs>
+
+          <md-dialog-actions>
+            <md-button class="md-primary" @click="showDialog = false"
+              >Close</md-button
+            >
+          </md-dialog-actions>
+        </md-dialog>
+
+        <md-button class="" id="credit" @click="showDialog = true"
+          >Credit</md-button
+        >
       </div>
     </div>
   </div>
 </template>
 
 <script>
+// color palette https://flatuicolors.com/palette/us
+
 // @ is an alias to /src
 // import HelloWorld from '@/components/HelloWorld.vue'
 import Vue from "vue";
-import { MdButton, MdField } from "vue-material/dist/components";
+import {
+  MdButton,
+  MdField,
+  MdDialog,
+  MdTabs,
+} from "vue-material/dist/components";
 import "vue-material/dist/vue-material.min.css";
 import "vue-material/dist/theme/default.css";
 
 Vue.use(MdButton);
 Vue.use(MdField);
+Vue.use(MdDialog);
+Vue.use(MdTabs);
 
 export default {
   name: "Home",
   components: {},
   data() {
-    return { username: "", validationMessage: "" };
+    return {
+      username: "",
+      validationMessage: "",
+      showDialog: false,
+    };
   },
   computed: {
     validation() {
@@ -97,5 +137,22 @@ export default {
 
 .login-button {
   background-color: #00b894 !important;
+}
+
+#login-input {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  flex: 1 0 auto;
+  width: 200px;
+}
+
+#credit {
+  flex: 0 0 auto;
+}
+
+#credit-content {
+  padding: 20px;
 }
 </style>
