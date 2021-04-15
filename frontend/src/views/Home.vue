@@ -71,6 +71,7 @@ export default {
     return {
       username: "",
       validationMessage: "",
+      id: -1,
       showDialog: false,
     };
   },
@@ -89,12 +90,25 @@ export default {
   methods: {
     submit() {
       if (this.username === "") {
+        // no empty username
         this.validationMessage = "Please enter your username.";
         return;
       }
+      window.hello = 1;
+      // Send username to server, get user id, redirect to chatting page
+      // var ws = new WebSocket("ws://" + process.env.VUE_APP_BASE_API);
+
       if (this.username) {
+        // No repeat username
         this.validationMessage =
           "This username is in use. Please choose a new one.";
+        return;
+      }
+      // save login token
+      if (this.id != -1) {
+        window.sessionStorage.setItem("id", this.id);
+        window.sessionStorage.setItem("username", this.username);
+        this.$router.push("main");
       }
     },
   },
