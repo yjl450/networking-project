@@ -3,7 +3,8 @@
     <div class="login-back">
       <div class="login-box">
         <div id="login-input">
-          <span class="md-headline">Welcome</span><br /><br />
+          <span class="md-title">Welcome<br />
+          Let's start a <span id="logo">Convo!</span></span><br />
           <md-field :class="validation">
             <label>Username</label>
             <md-input v-model="username"></md-input>
@@ -168,5 +169,9 @@ export default {
 
 #credit-content {
   padding: 20px;
+}
+
+#logo {
+  font-family: 'Libre Baskerville', serif;
 }
 </style>
