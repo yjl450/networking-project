@@ -47,9 +47,10 @@
         </div>
       </md-app-toolbar>
       <md-app-content id="messages" class="md-scrollbar">
+        <Bubble :key="m.index" v-for="m in current_messages" :message="m" />
         <md-empty-state
           md-icon="speaker_notes_off"
-          md-label="You don't have any chat."
+          md-label="Start a conversation!"
           v-if="!current_chat"
         >
           <span v-if="!mobile"
@@ -104,11 +105,13 @@
 import { TwemojiPicker } from "@kevinfaguiar/vue-twemoji-picker";
 import emojiData from "@/assets/emoji-all-groups.json";
 import emojiGroups from "@/assets/emoji-groups.json";
+import Bubble from "@/components/Bubble.vue";
 
 export default {
   name: "Chat",
   components: {
     TwemojiPicker,
+    Bubble,
   },
   data() {
     return {
@@ -123,9 +126,21 @@ export default {
     };
   },
   props: {
+    username: String,
+    id: Number,
+
     mobile: Boolean,
     showlist: Boolean,
-    current_chat: {},
+    current_chat: Object,
+
+    current_messages: Array
+    // [
+    //   {
+    //     sender: String,
+    //     message: String,
+    //     me: Boolean,
+    //   },
+    // ],
   },
   mounted() {
     document.getElementById("textbox").addEventListener("keydown", (evt) => {
@@ -138,14 +153,26 @@ export default {
   computed: {
     chat_member() {
       if (this.current_chat === null) {
-        return "Welcome";
+        return "Welcome, " + this.username;
       }
-      var names = Object.values(this.current_chat.member);
+      var names = { ...this.current_chat.member };
+      delete names[this.id];
+      names = Object.values(names);
       if (names.length > 1) {
-        return "(" + names.length + ") " + names.join(", ");
+        return (
+          "(" +
+          (names.length + 1) +
+          ") " +
+          names.join(", ") +
+          ", " +
+          this.username
+        );
       }
-      return names.join(", ");
+      return names[0];
     },
+  },
+  beforeDestroy() {
+    this.close_app();
   },
   methods: {
     handleEmojiPicked(e) {
@@ -155,21 +182,29 @@ export default {
     onInput(text) {
       this.new_message = text.target.textContent;
     },
+    togglelist() {
+      this.listshow = !this.showlist;
+      this.$emit("togglelist", this.listshow);
+    },
+    // Network related
     send_message() {
       console.log(this.new_message);
       document.getElementById("textbox").innerHTML = "";
       this.new_message = "";
     },
     logout_confirm() {
+      // TODO: send logout info to server
+      this.close_app();
       this.logout = false;
     },
     leave_confirm() {
+      if (this.current_chat.id % 10 !== 0) {
+        // TODO: send info to server
+      }
+      this.$emit("quit_chat", null);
       this.leave = false;
     },
-    togglelist() {
-      this.listshow = !this.showlist;
-      this.$emit("togglelist", this.listshow);
-    },
+    close_app() {},
   },
 };
 </script>
