@@ -7,7 +7,7 @@ client: send
     
     {"action": "newuser", "username": *username*}
 
-server: send 
+server: reply 
     
     {"action":"newuser", "id": *userid*}
 
@@ -35,7 +35,7 @@ Client: send
     
     {"action": "message", "sender": *userid*, "receiver": *userid*, "message": *content*}
 
-Server: forward the message 
+Server: forward the message to the receiver
     
     {"action": "message", "sender": *userid*, "receiver": *userid*, "message": *content*}
 
@@ -53,13 +53,13 @@ client: send
 
     {"action": "newgroup", 
      "sender": *userid*, 
-     "member":{*userid*: *username*}}
-Server: update contact list
+     "member":{*userid*: *username*}} // including sender
+Server: update contact list 
 
 ## Leave Group
 client: send 
 
-    {"action": "leave", "group": *groupid*, "sender": *userid*}
+    {"action": "leave", "groupid": *groupid*, "sender": *userid*}
 Server: remove user from group. If there are only two users in the group, delete the group, then update contact list
 
 ## Logout
