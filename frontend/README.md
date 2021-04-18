@@ -1,6 +1,7 @@
-# frontend
+# Frontend
+Messaging APP  frontend powered by VUE
 
-## Project setup
+## Frontend setup
 ```
 yarn install
 ```
