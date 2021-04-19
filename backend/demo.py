@@ -8,6 +8,7 @@ app = Flask(__name__,
             template_folder = "../frontend/dist")
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
+# , async_mode="threading")
 
 
 jinja_options = app.jinja_options.copy()
@@ -22,9 +23,13 @@ def index():
     return render_template("index.html")
 
 @socketio.on('login')
-def test_message(message):
-    print(request.sid, message)
-    emit('login-response', {'username': message['username'], "userid": 1001})
+def login(message):
+    print("RECV:", request.sid, message)
+    print("SEND:",{'username': message['username'], "userid": request.sid})
+    #validation
+    emit('login-response', {'username': message['username'], "result":"success", "userid": request.sid})
+
+
 
 # @socketio.on('connect')
 # def test_connect():
