@@ -9,7 +9,7 @@
         class="md-layout-item"
         id="list"
         v-show="(mobile && showlist) || !mobile"
-         style="animation-duration: 0.3s"
+        style="animation-duration: 0.3s"
       >
         <md-list :md-expand-single="mobile">
           <md-list-item>
@@ -79,7 +79,7 @@
         class="md-layout-item"
         id="chat-panel"
         v-show="!mobile || (mobile && !showlist)"
-         style="animation-duration: 0.3s"
+        style="animation-duration: 0.3s"
       >
         <Chat
           :current_chat="current_chat"
@@ -125,47 +125,9 @@ export default {
 
       // Chat list content
       current_chat: null,
-
-      chat_list: [102790, 1029981],
-      // contact_list:{
-      //   person:{},
-      //   group:{},
-      // },
-      contact_list: {
-        person: {
-          102790: {
-            102790: "Perry",
-          },
-          106290: {
-            106290: "Maggie",
-          },
-        },
-        group: {
-          1029981: {
-            10010: "hellen",
-            10030: "mike",
-            10040: "carol",
-            10050: "vera",
-
-            10060: "hellen",
-            10070: "mike",
-            10080: "carol",
-            10090: "vera",
-
-            10100: "hellen",
-            10130: "mike",
-            10240: "carol",
-            10250: "vera",
-          },
-          1078981: {
-            10010: "hellen",
-            10030: "mike",
-            10040: "carol",
-            10050: "vera",
-            13479: "Harry",
-          },
-        },
-      },
+      chat_list: [],
+      // chat_list: [102790, 1029981],
+      contact_list: {},
       chat_message: {
         1029981: [
           { sender: 10040, message: "hello" },
@@ -194,17 +156,27 @@ export default {
     };
   },
   created() {
-      // Back to login page if no login token
+    // Back to login page if no login token
     if (this.$root.id !== "") {
       this.id = this.$root.id;
       this.username = this.$root.username;
     } else {
       this.$router.push("/");
+      return;
     }
   },
   mounted() {
     this.resize();
     window.onresize = this.resize;
+    // register contact update listener
+    this.$root.s.on("contact", (r) => {
+      console.log(r);
+      this.contact_list = {};
+      this.contact_list.person = r["person"];
+      this.contact_list.group = r["group"];
+      console.log(this.contact_list);
+    });
+    this.contact_list = this.$root.contact;
   },
   computed: {
     current_messages() {
@@ -232,7 +204,7 @@ export default {
       for (let cid = 0; cid < this.chat_list.length; cid++) {
         var newObj = {};
         //one-on-one
-        if (this.chat_list[cid] % 10 === 0) {
+        if (this.chat_list[cid].length == 20) {
           newObj.names = this.chat_naming(
             this.contact_list.person[this.chat_list[cid]]
           );
@@ -252,9 +224,9 @@ export default {
 
     group_list() {
       var returnArray = [];
-      var id = 0;
+      var id = "";
       for (var i in this.contact_list.group) {
-        id = parseInt(i);
+        id = i;
         if (!this.chat_list.includes(id)) {
           var newObj = {};
           newObj.id = id;
@@ -268,10 +240,10 @@ export default {
 
     person_list() {
       var returnArray = [];
-      var id = 0;
+      var id = "";
       for (var i in this.contact_list.person) {
-        id = parseInt(i);
-        if (!this.chat_list.includes(id)) {
+        id = i;
+        if (!this.chat_list.includes(id) && id !== this.id) {
           var newObj = {};
           newObj.id = id;
           newObj.names = this.contact_list.person[id][id];

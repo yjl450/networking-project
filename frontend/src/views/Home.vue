@@ -93,6 +93,7 @@ export default {
   },
   methods: {
     submit() {
+      this.validationMessage = "";
       if (this.name === "") {
         // no empty username
         this.validationMessage = "Please enter your username.";
@@ -101,27 +102,22 @@ export default {
       // Send username to server, get user id, redirect to chatting page
       if (this.$root.s === null) {
         this.$root.s = io(process.env.VUE_APP_BASE_API);
-        console.log(this.$root.s.id);
       }
-
       this.$root.s.on("login-response", (r) => {
-        console.log("receive", r)
         if (r["result"] === "success") {
           this.$root.username = r["username"];
-          console.log(this.$root.username, this.$root.id);
           this.$root.id = r["userid"];
-          console.log(this.$root.username, this.$root.id);
           this.$router.push("main");
-        } 
-        // if (r["error"]) {
-        //   // No repeat username
-        //   this.validationMessage =
-        //     // "This username is in use. Please choose a new one.";
-        //     r["error"];
-        //   return;
-        // }
+        }
+        if (r["result"] === "duplicate") {
+          // No repeat username
+          this.validationMessage =
+            "This username is in use. Please choose a new one.";
+        }
       });
-
+      this.$root.s.on("contact", (r) => {
+        this.$root.contact = r;
+      });
       this.$root.s.emit("login", { username: this.name });
     },
   },

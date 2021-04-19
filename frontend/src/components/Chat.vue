@@ -127,7 +127,7 @@ export default {
   },
   props: {
     username: String,
-    id: Number,
+    id: String,
 
     mobile: Boolean,
     showlist: Boolean,

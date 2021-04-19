@@ -9,7 +9,8 @@ new Vue({
     return {
       s: null, //socket
       id: "",
-      username: ""
+      username: "",
+      contact: {}
     }
   },
   router,
