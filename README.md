@@ -28,25 +28,14 @@ Server: send
         }
     }
 
-
-
-## Send message to single user
-Client: send
-    
-    {"action": "message", "sender": *userid*, "receiver": *userid*, "message": *content*}
-
-Server: forward the message to the receiver
-    
-    {"action": "message", "sender": *userid*, "receiver": *userid*, "message": *content*}
-
 ## Send message to group
 Client: send 
     
-    {"action": "groupmessage", "sender": *userid*, "receiver": *groupid*, "message": *content*}
+    {"action": "message", "sender": *userid*, "receiver": *groupid*, "message": *content*}
 
 Server: forward the message to all members of the group (excluding sender) 
     
-    {"action": "groupmessage", "sender": *userid*, "receiver": *groupid*, "message": *content*}
+    {"action": "message", "sender": *userid*, "receiver": *groupid*, "message": *content*}
 
 ## Create Group
 client: send
@@ -56,11 +45,17 @@ client: send
      "member":{*userid*: *username*}} // including sender
 Server: update contact list 
 
+## Join Group
+client: send 
+
+    {"action": "join", "groupid": *groupid*, "sender": *userid*}
+Server: remove user from person list, update contact list
+
 ## Leave Group
 client: send 
 
     {"action": "leave", "groupid": *groupid*, "sender": *userid*}
-Server: remove user from group. If there are only two users in the group, delete the group, then update contact list
+Server: remove user from group. If there is only one user in the group, delete the group, then update contact list
 
 ## Logout
 client: send
