@@ -11,6 +11,7 @@
     "@kevinfaguiar/vue-twemoji-picker": "^5.7.4",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "socket.io-client": "^4.0.1",
     "vue": "^2.6.11",
     "vue-material": "^1.0.0-beta-15",
     "vue-router": "^3.2.0"
