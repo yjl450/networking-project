@@ -87,7 +87,6 @@
         <div
           id="textbox"
           contenteditable="plaintext-only"
-          @input="onInput"
           display:inline-block
         ></div>
       </div>
@@ -120,9 +119,9 @@ export default {
       leave: false,
       full_title: false,
       listshow: false,
-      new_message: "",
       emojiData: emojiData,
       emojiGroups: emojiGroups,
+      message: "",
     };
   },
   props: {
@@ -133,14 +132,7 @@ export default {
     showlist: Boolean,
     current_chat: Object,
 
-    current_messages: Array
-    // [
-    //   {
-    //     sender: String,
-    //     message: String,
-    //     me: Boolean,
-    //   },
-    // ],
+    current_messages: Array,
   },
   mounted() {
     document.getElementById("textbox").addEventListener("keydown", (evt) => {
@@ -177,10 +169,7 @@ export default {
   methods: {
     handleEmojiPicked(e) {
       document.getElementById("textbox").innerHTML += e;
-      this.new_message = document.getElementById("textbox").textContent;
-    },
-    onInput(text) {
-      this.new_message = text.target.textContent;
+      // this.new_message = document.getElementById("textbox").textContent;
     },
     togglelist() {
       this.listshow = !this.showlist;
@@ -188,9 +177,17 @@ export default {
     },
     // Network related
     send_message() {
-      console.log(this.new_message);
+      this.$root.s.emit("message", {
+        sender: this.id,
+        receiver: this.current_chat.id,
+        message: document.getElementById("textbox").textContent,
+      });
+      this.$emit("new_message", {
+        sender: this.id,
+        receiver: this.current_chat.id,
+        message: document.getElementById("textbox").textContent,
+      });
       document.getElementById("textbox").innerHTML = "";
-      this.new_message = "";
     },
     logout_confirm() {
       // TODO: send logout info to server
@@ -198,7 +195,7 @@ export default {
       this.logout = false;
     },
     leave_confirm() {
-      if (this.current_chat.id % 10 !== 0) {
+      if (this.current_chat.id.length !== 20) {
         // TODO: send info to server
       }
       this.$emit("quit_chat", null);

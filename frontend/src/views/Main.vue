@@ -88,6 +88,7 @@
           :username="username"
           :current_messages="current_messages"
           :showlist="showlist"
+          v-on:new_message="new_message"
           v-on:togglelist="togglelist"
           v-on:quit_chat="quit_chat"
         />
@@ -113,8 +114,6 @@ export default {
   data() {
     return {
       // current account
-      // id: -1,
-      // username: "",
       id: this.$root.id,
       username: this.$root.username,
 
@@ -126,33 +125,33 @@ export default {
       // Chat list content
       current_chat: null,
       chat_list: [],
-      // chat_list: [102790, 1029981],
       contact_list: {},
-      chat_message: {
-        1029981: [
-          { sender: 10040, message: "hello" },
-          {
-            sender: 10010,
-            message: "Nice to meet you!",
-          },
-          { sender: 10040, message: "wefuwifhwiuofhuwfhhwfiuhwiufhwihfuihiw" },
-          { sender: 10040, message: "hello" },
-          { sender: 10040, message: "hello" },
-          {
-            sender: 10010,
-            message: "Nice to meet you!",
-          },
-          { sender: 10040, message: "wefuwifhwiuofhuwfhhwfiuhwiufhwihfuihiw" },
-          { sender: 10040, message: "hello" },
-          { sender: 10040, message: "hello" },
-          {
-            sender: 10010,
-            message: "Nice to meet you!",
-          },
-          { sender: 10040, message: "wefuwifhwiuofhuwfhhwfiuhwiufhwihfuihiw" },
-          { sender: 10040, message: "hello" },
-        ],
-      },
+      // chat_message: {
+      //   1029981: [
+      //     { sender: 10040, message: "hello" },
+      //     {
+      //       sender: 10010,
+      //       message: "Nice to meet you!",
+      //     },
+      //     { sender: 10040, message: "wefuwifhwiuofhuwfhhwfiuhwiufhwihfuihiw" },
+      //     { sender: 10040, message: "hello" },
+      //     { sender: 10040, message: "hello" },
+      //     {
+      //       sender: 10010,
+      //       message: "Nice to meet you!",
+      //     },
+      //     { sender: 10040, message: "wefuwifhwiuofhuwfhhwfiuhwiufhwihfuihiw" },
+      //     { sender: 10040, message: "hello" },
+      //     { sender: 10040, message: "hello" },
+      //     {
+      //       sender: 10010,
+      //       message: "Nice to meet you!",
+      //     },
+      //     { sender: 10040, message: "wefuwifhwiuofhuwfhhwfiuhwiufhwihfuihiw" },
+      //     { sender: 10040, message: "hello" },
+      //   ],
+      // },
+      chat_message: [],
     };
   },
   created() {
@@ -168,15 +167,16 @@ export default {
   mounted() {
     this.resize();
     window.onresize = this.resize;
+    this.contact_list = this.$root.contact;
     // register contact update listener
     this.$root.s.on("contact", (r) => {
-      console.log(r);
       this.contact_list = {};
       this.contact_list.person = r["person"];
       this.contact_list.group = r["group"];
-      console.log(this.contact_list);
     });
-    this.contact_list = this.$root.contact;
+    this.$root.s.on("message", (r) => {
+      this.new_message(r);
+    });
   },
   computed: {
     current_messages() {
@@ -190,13 +190,14 @@ export default {
       var i = 0;
       this.chat_message[this.current_chat.id].forEach((e) => {
         var newObj = {};
-        newObj.sender = this.current_chat.member[e.sender];
-        newObj.message = e.message;
-        newObj.me = e.sender === this.id;
+        newObj.sender = this.current_chat.member[e["sender"]];
+        newObj.message = e["message"];
+        newObj.me = e["sender"] == this.id;
         newObj.index = i;
         i++;
         newArray.push(newObj);
       });
+      console.log(newArray);
       return newArray;
     },
     connected_chat_list() {
@@ -230,7 +231,7 @@ export default {
         if (!this.chat_list.includes(id)) {
           var newObj = {};
           newObj.id = id;
-          newObj.names = this.chat_naming(this.contact_list.group[id]);
+          newObj.names = this.chat_naming(this.contact_list.group[id], false);
           newObj.member = this.contact_list.group[id];
           returnArray.push(newObj);
         }
@@ -268,29 +269,43 @@ export default {
       this.current_chat.id = c.id;
       this.current_chat.member = c.member;
       this.chat_list.push(c.id);
-      this.chat_message[c.id] = [];
       if (this.mobile && this.showlist) {
         this.showlist = !this.showlist;
       }
     },
-    chat_naming(name_record) {
+    chat_naming(name_record, chosen = true) {
       var names = { ...name_record };
       delete names[this.id];
       names = Object.values(names);
       if (names.length > 1) {
-        return (
-          "(" +
-          (names.length + 1) +
-          ") " +
-          names.join(", ") +
-          ", " +
-          this.username
-        );
+        if (chosen) {
+          return (
+            "(" +
+            (names.length + 1) +
+            ") " +
+            names.join(", ") +
+            ", " +
+            this.username
+          );
+        } else {
+          return "(" + names.length + ") " + names.join(", ");
+        }
       }
       return names[0];
     },
     togglelist(showlist) {
       this.showlist = showlist;
+    },
+    new_message(m) {
+      var s = m.sender;
+      var mm = m.message;
+      var newObj = {};
+      if (this.chat_message[m.receiver] === undefined) {
+        this.$set(this.chat_message, m.receiver, []); //[m.receiver] = [];
+      }
+      newObj["sender"] = s;
+      newObj["message"] = mm;
+      this.chat_message[m.receiver].push(newObj);
     },
     quit_chat(q) {
       delete this.chat_message[this.current_chat.id];
