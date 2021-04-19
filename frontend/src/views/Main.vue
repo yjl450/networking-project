@@ -115,8 +115,8 @@ export default {
       // current account
       // id: -1,
       // username: "",
-      id: 10010,
-      username: "hellen",
+      id: this.$root.id,
+      username: this.$root.username,
 
       // Display related
       mobile: false,
@@ -194,13 +194,13 @@ export default {
     };
   },
   created() {
-    //   Back to login page if no login token
-    // if (window.sessionStorage.getItem("id")) {
-    //   this.id = window.sessionStorage.getItem("id");
-    //   this.username = window.sessionStorage.getItem("username");
-    // } else {
-    //   this.$router.push("/");
-    // }
+      // Back to login page if no login token
+    if (this.$root.id !== "") {
+      this.id = this.$root.id;
+      this.username = this.$root.username;
+    } else {
+      this.$router.push("/");
+    }
   },
   mounted() {
     this.resize();

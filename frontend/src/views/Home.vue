@@ -3,11 +3,13 @@
     <div class="login-back">
       <div class="login-box">
         <div id="login-input">
-          <span class="md-title">Welcome<br />
-          Let's start a <span id="logo">Convo!</span></span><br />
+          <span class="md-title"
+            >Welcome<br />
+            Let's start a <span id="logo">Convo!</span></span
+          ><br />
           <md-field :class="validation">
             <label>Username</label>
-            <md-input v-model="username"></md-input>
+            <md-input v-model="name"></md-input>
             <span class="md-error">{{ validationMessage }}</span>
           </md-field>
           <br />
@@ -59,6 +61,7 @@ import {
 } from "vue-material/dist/components";
 import "vue-material/dist/vue-material.min.css";
 import "vue-material/dist/theme/default.css";
+import { io } from "socket.io-client";
 
 Vue.use(MdButton);
 Vue.use(MdField);
@@ -70,9 +73,9 @@ export default {
   components: {},
   data() {
     return {
-      username: "",
+      name: "",
       validationMessage: "",
-      id: -1,
+      // id: -1,
       showDialog: false,
     };
   },
@@ -90,27 +93,36 @@ export default {
   },
   methods: {
     submit() {
-      if (this.username === "") {
+      if (this.name === "") {
         // no empty username
         this.validationMessage = "Please enter your username.";
         return;
       }
-      window.hello = 1;
       // Send username to server, get user id, redirect to chatting page
-      // var ws = new WebSocket("ws://" + process.env.VUE_APP_BASE_API);
+      if (this.$root.s === null) {
+        this.$root.s = io(process.env.VUE_APP_BASE_API);
+        console.log(this.$root.s.id);
+      }
 
-      if (this.username) {
-        // No repeat username
-        this.validationMessage =
-          "This username is in use. Please choose a new one.";
-        return;
-      }
-      // save login token
-      if (this.id != -1) {
-        window.sessionStorage.setItem("id", this.id);
-        window.sessionStorage.setItem("username", this.username);
-        this.$router.push("main");
-      }
+      this.$root.s.on("login-response", (r) => {
+        console.log("receive", r)
+        if (r["result"] === "success") {
+          this.$root.username = r["username"];
+          console.log(this.$root.username, this.$root.id);
+          this.$root.id = r["userid"];
+          console.log(this.$root.username, this.$root.id);
+          this.$router.push("main");
+        } 
+        // if (r["error"]) {
+        //   // No repeat username
+        //   this.validationMessage =
+        //     // "This username is in use. Please choose a new one.";
+        //     r["error"];
+        //   return;
+        // }
+      });
+
+      this.$root.s.emit("login", { username: this.name });
     },
   },
 };
@@ -172,6 +184,6 @@ export default {
 }
 
 #logo {
-  font-family: 'Libre Baskerville', serif;
+  font-family: "Libre Baskerville", serif;
 }
 </style>

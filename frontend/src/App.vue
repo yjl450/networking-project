@@ -10,3 +10,9 @@
   -moz-osx-font-smoothing: grayscale;
 }
 </style>
+
+<script>
+export default {
+  
+}
+</script>
