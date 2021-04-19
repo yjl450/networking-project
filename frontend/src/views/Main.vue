@@ -126,31 +126,6 @@ export default {
       current_chat: null,
       chat_list: [],
       contact_list: {},
-      // chat_message: {
-      //   1029981: [
-      //     { sender: 10040, message: "hello" },
-      //     {
-      //       sender: 10010,
-      //       message: "Nice to meet you!",
-      //     },
-      //     { sender: 10040, message: "wefuwifhwiuofhuwfhhwfiuhwiufhwihfuihiw" },
-      //     { sender: 10040, message: "hello" },
-      //     { sender: 10040, message: "hello" },
-      //     {
-      //       sender: 10010,
-      //       message: "Nice to meet you!",
-      //     },
-      //     { sender: 10040, message: "wefuwifhwiuofhuwfhhwfiuhwiufhwihfuihiw" },
-      //     { sender: 10040, message: "hello" },
-      //     { sender: 10040, message: "hello" },
-      //     {
-      //       sender: 10010,
-      //       message: "Nice to meet you!",
-      //     },
-      //     { sender: 10040, message: "wefuwifhwiuofhuwfhhwfiuhwiufhwihfuihiw" },
-      //     { sender: 10040, message: "hello" },
-      //   ],
-      // },
       chat_message: [],
     };
   },
