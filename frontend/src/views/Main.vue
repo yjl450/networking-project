@@ -46,7 +46,7 @@
                 class="md-ripple"
                 v-for="c in group_list"
                 :key="c.id"
-                @click="join_chat(c)"
+                @click="list_join_group(c)"
                 >{{ c.names }}
               </md-list-item>
             </md-list>
@@ -88,6 +88,7 @@
           :username="username"
           :current_messages="current_messages"
           :showlist="showlist"
+          :person_list="person_list"
           v-on:new_message="new_message"
           v-on:togglelist="togglelist"
           v-on:quit_chat="quit_chat"
@@ -138,6 +139,8 @@ export default {
       this.$router.push("/");
       return;
     }
+
+    // window.addEventListener("beforeunload", this.preventRefresh);
   },
   mounted() {
     this.resize();
@@ -152,6 +155,10 @@ export default {
     this.$root.s.on("message", (r) => {
       this.new_message(r);
     });
+    this.$root.s.on("new_group", this.group_nogui);
+  },
+  beforeDestroy() {
+    this.close_app();
   },
   computed: {
     current_messages() {
@@ -239,11 +246,30 @@ export default {
         this.showlist = !this.showlist;
       }
     },
+    group_gui(r) {
+      var chatObj = {};
+      chatObj.id = r["id"];
+      chatObj.member = r["member"];
+      this.join_chat(chatObj);
+      this.$root.s.off("new_group", this.group_gui);
+    },
+    group_nogui(r) {
+      if (!this.chat_list.includes(r["id"])) {
+        this.chat_list.push(r["id"]);
+      }
+    },
+    list_join_group(c) {
+      this.$root.s.on("new_group", this.group_gui);
+      this.$root.s.emit("join", { groupid: c.id, sender: this.id });
+    },
     join_chat(c) {
       this.current_chat = {};
       this.current_chat.id = c.id;
       this.current_chat.member = c.member;
-      this.chat_list.push(c.id);
+      // this.chat_list.push(c.id);
+      if (!this.chat_list.includes(c.id)) {
+        this.chat_list.push(c.id);
+      }
       if (this.mobile && this.showlist) {
         this.showlist = !this.showlist;
       }
@@ -319,6 +345,21 @@ export default {
           window.innerWidth / 4 + "px";
         document.getElementById("title").style.width =
           (window.innerWidth / 4) * 3 - 85 + "px";
+      }
+    },
+    close_app() {
+      this.$root.s.emit("logout", { sender: this.id });
+      for (var listener in this.$root.s.$events) {
+        if (listener != undefined) {
+          this.$root.s.removeAllListeners(listener);
+        }
+      }
+      this.$root.s.close();
+      if (!this.$root.s.connected) {
+        this.$root.id = "";
+        this.$root.username = "";
+        this.$root.contact = {};
+        this.$root.s = null;
       }
     },
   },
