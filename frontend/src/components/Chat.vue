@@ -95,7 +95,6 @@
       <md-app-content id="messages" class="md-scrollbar">
         <Bubble :key="m.index" v-for="m in current_messages" :message="m" />
         <md-empty-state v-if="!current_chat">
-          <!-- md-label="Start a conversation!" -->
           <md-icon class="md-size-5x">🤣</md-icon><br /><br>
           <span class="md-display-1">Start a conversation!</span>
           <span v-if="!mobile"
