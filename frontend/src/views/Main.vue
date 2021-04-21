@@ -179,7 +179,6 @@ export default {
         i++;
         newArray.push(newObj);
       });
-      console.log(newArray);
       return newArray;
     },
     connected_chat_list() {
@@ -247,11 +246,13 @@ export default {
       }
     },
     group_gui(r) {
+      this.$root.s.off("new_group", this.group_nogui);
       var chatObj = {};
       chatObj.id = r["id"];
       chatObj.member = r["member"];
       this.join_chat(chatObj);
       this.$root.s.off("new_group", this.group_gui);
+      this.$root.s.on("new_group", this.group_nogui);
     },
     group_nogui(r) {
       if (!this.chat_list.includes(r["id"])) {
@@ -260,7 +261,7 @@ export default {
     },
     list_join_group(c) {
       this.$root.s.on("new_group", this.group_gui);
-      this.$root.s.emit("join", { groupid: c.id, sender: this.id });
+      this.$root.s.emit("join_group", { groupid: c.id, sender: this.id });
     },
     join_chat(c) {
       this.current_chat = {};
@@ -274,23 +275,23 @@ export default {
         this.showlist = !this.showlist;
       }
     },
-    chat_naming(name_record, chosen = true) {
+    chat_naming(name_record) {
       var names = { ...name_record };
-      delete names[this.id];
+      // delete names[this.id];
       names = Object.values(names);
       if (names.length > 1) {
-        if (chosen) {
-          return (
-            "(" +
-            (names.length + 1) +
-            ") " +
-            names.join(", ") +
-            ", " +
-            this.username
-          );
-        } else {
+        // if (chosen) {
+          // return (
+          //   "(" +
+          //   (names.length + 1) +
+          //   ") " +
+          //   names.join(", ") +
+          //   ", " +
+          //   this.username
+          // );
+        // } else {
           return "(" + names.length + ") " + names.join(", ");
-        }
+        // }
       }
       return names[0];
     },

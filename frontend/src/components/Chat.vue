@@ -239,25 +239,24 @@ export default {
       document.getElementById("textbox").innerHTML = "";
     },
     join_group() {
-      if ((this.new_member = "")) {
+      if (this.new_member == "") {
         this.join_confirm = false;
-        return
+        return;
       }
       // Only in one-to-one chat
+      var newmember = eval("(" + this.new_member + ")");
       if (this.current_chat.id.length === 20) {
-        var new_member_id = this.new_member.id;
-        var new_member_name = this.new_member.names;
         var member = {};
         member[this.id] = this.username;
-        member[new_member_id] = new_member_name;
+        member[newmember.id] = newmember.names;
         member[this.current_chat.id] = this.current_chat.member[
           this.current_chat.id
         ];
-        this.$root.s.emit("newgroup", { sender: this.id, member: member });
+        this.$root.s.emit("create_group", { sender: this.id, member: member });
       } else {
-        this.$root.s.emit("join", {
+        this.$root.s.emit("join_group", {
           groupid: this.current_chat.id,
-          sender: this.new_member.member,
+          sender: newmember.id,
         });
       }
       this.new_member = "";
@@ -269,7 +268,7 @@ export default {
     },
     leave_confirm() {
       if (this.current_chat.id.length !== 20) {
-        this.$root.s.emit("leave", {
+        this.$root.s.emit("leave_group", {
           groupid: this.current_chat.id,
           sender: this.id,
         });
