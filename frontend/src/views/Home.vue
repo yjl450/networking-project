@@ -9,7 +9,7 @@
           ><br />
           <md-field :class="validation">
             <label>Username</label>
-            <md-input v-model="name"></md-input>
+            <md-input v-model="name" maxlength="10" required @input="validate()"></md-input>
             <span class="md-error">{{ validationMessage }}</span>
           </md-field>
           <br />
@@ -52,22 +52,7 @@
 
 // @ is an alias to /src
 // import HelloWorld from '@/components/HelloWorld.vue'
-import Vue from "vue";
-import {
-  MdButton,
-  MdField,
-  MdDialog,
-  MdTabs,
-} from "vue-material/dist/components";
-import "vue-material/dist/vue-material.min.css";
-import "vue-material/dist/theme/default.css";
 import { io } from "socket.io-client";
-
-Vue.use(MdButton);
-Vue.use(MdField);
-Vue.use(MdDialog);
-Vue.use(MdTabs);
-
 export default {
   name: "Home",
   components: {},
@@ -92,14 +77,17 @@ export default {
     }
   },
   methods: {
-    submit() {
-      this.validationMessage = "";
+    validate() {
       if (this.name === "") {
-        // no empty username
-        this.validationMessage = "Please enter your username.";
+        this.validationMessage = "Please enter a username.";
         return;
+      } else {
+        this.validationMessage = "";
       }
+    },
+    submit() {
       // Send username to server, get user id, redirect to chatting page
+      this.validate();
       if (this.$root.s === null) {
         this.$root.s = io(process.env.VUE_APP_BASE_API);
       }
@@ -156,6 +144,11 @@ export default {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  --md-theme-default-primary: #6c5ce7 !important;
+}
+
+.md-focused label {
+  color: #6c5ce7 !important;
 }
 
 .login-button {

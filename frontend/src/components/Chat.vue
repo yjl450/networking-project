@@ -94,11 +94,10 @@
       </md-app-toolbar>
       <md-app-content id="messages" class="md-scrollbar">
         <Bubble :key="m.index" v-for="m in current_messages" :message="m" />
-        <md-empty-state
-          md-icon="speaker_notes_off"
-          md-label="Start a conversation!"
-          v-if="!current_chat"
-        >
+        <md-empty-state v-if="!current_chat">
+          <!-- md-label="Start a conversation!" -->
+          <md-icon class="md-size-5x">🤣</md-icon><br /><br>
+          <span class="md-display-1">Start a conversation!</span>
           <span v-if="!mobile"
             >Select an online user on the left to start a conversation.</span
           >
