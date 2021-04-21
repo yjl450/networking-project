@@ -42,21 +42,33 @@ Server: forward the message to all members of the group (excluding sender)
 ## Create Group
 client: send
 
-    {"action": "newgroup", 
+    {"action": "create_group", 
      "sender": *userid*, 
      "member":{*userid*: *username*}} // including sender
-Server: update contact list 
+Server: 
+
+broadcast to all member in this group 
+    
+    {"action": "new_group", "groupid": groupid, "member":{*userid*: *username*} }
+
+then update contact list 
 
 ## Join Group
 client: send 
 
-    {"action": "join", "groupid": *groupid*, "sender": *userid*}
-Server: remove user from person list, update contact list
+    {"action": "join_group", "groupid": *groupid*, "sender": *userid*}
+Server: 
+
+broadcast to all member in this group 
+
+    {"action": "new_group", "groupid": groupid, "member":{*userid*: *username*} }
+
+then update contact list
 
 ## Leave Group
 client: send 
 
-    {"action": "leave", "groupid": *groupid*, "sender": *userid*}
+    {"action": "leave_group", "groupid": *groupid*, "sender": *userid*}
 Server: remove user from group. If there is only one user in the group, delete the group, then update contact list
 
 ## Logout
