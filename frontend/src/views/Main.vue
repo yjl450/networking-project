@@ -281,16 +281,16 @@ export default {
       names = Object.values(names);
       if (names.length > 1) {
         // if (chosen) {
-          // return (
-          //   "(" +
-          //   (names.length + 1) +
-          //   ") " +
-          //   names.join(", ") +
-          //   ", " +
-          //   this.username
-          // );
+        // return (
+        //   "(" +
+        //   (names.length + 1) +
+        //   ") " +
+        //   names.join(", ") +
+        //   ", " +
+        //   this.username
+        // );
         // } else {
-          return "(" + names.length + ") " + names.join(", ");
+        return "(" + names.length + ") " + names.join(", ");
         // }
       }
       return names[0];
@@ -302,12 +302,25 @@ export default {
       var s = m.sender;
       var mm = m.message;
       var newObj = {};
-      if (this.chat_message[m.receiver] === undefined) {
-        this.$set(this.chat_message, m.receiver, []); //[m.receiver] = [];
-      }
       newObj["sender"] = s;
       newObj["message"] = mm;
-      this.chat_message[m.receiver].push(newObj);
+      if (m.receiver.length === 20 && m.sender !== this.id) {
+        if (!this.chat_list.includes(m.sender)) {
+          this.chat_list.push(m.sender);
+        }
+        if (this.chat_message[m.sender] === undefined) {
+          this.$set(this.chat_message, m.sender, []); //[m.receiver] = [];
+        }
+        this.chat_message[m.sender].push(newObj);
+      } else {
+        if (!this.chat_list.includes(m.receiver)) {
+          this.chat_list.push(m.receiver);
+        }
+        if (this.chat_message[m.receiver] === undefined) {
+          this.$set(this.chat_message, m.receiver, []); //[m.receiver] = [];
+        }
+        this.chat_message[m.receiver].push(newObj);
+      }
     },
     quit_chat(q) {
       delete this.chat_message[this.current_chat.id];

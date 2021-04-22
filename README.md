@@ -1,4 +1,8 @@
 # Computer Networking Midterm Project
+[![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/made-with-vue.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/not-a-bug-a-feature.svg)](https://forthebadge.com)
+
 By Yijian Liu (@yjl450), Leyi Sun
 
 # Communication Format
