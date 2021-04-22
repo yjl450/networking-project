@@ -127,7 +127,7 @@ export default {
       current_chat: null,
       chat_list: [],
       contact_list: {},
-      chat_message: [],
+      chat_message: {},
     };
   },
   created() {
@@ -155,7 +155,8 @@ export default {
     this.$root.s.on("message", (r) => {
       this.new_message(r);
     });
-    this.$root.s.on("new_group", this.group_nogui);
+    this.$root.s.on("update_group", this.group_nogui);
+    this.$root.s.on("delete_group", this.group_delete);
   },
   beforeDestroy() {
     this.close_app();
@@ -172,7 +173,7 @@ export default {
       var i = 0;
       this.chat_message[this.current_chat.id].forEach((e) => {
         var newObj = {};
-        newObj.sender = this.current_chat.member[e["sender"]];
+        newObj.sender = e["name"];
         newObj.message = e["message"];
         newObj.me = e["sender"] == this.id;
         newObj.index = i;
@@ -246,22 +247,43 @@ export default {
       }
     },
     group_gui(r) {
-      this.$root.s.off("new_group", this.group_nogui);
+      console.log("GUI");
       var chatObj = {};
-      chatObj.id = r["id"];
+      chatObj.id = r["groupid"];
       chatObj.member = r["member"];
       this.join_chat(chatObj);
-      this.$root.s.off("new_group", this.group_gui);
-      this.$root.s.on("new_group", this.group_nogui);
+      this.$root.s.off("update_group", this.group_gui);
+      this.$root.s.on("update_group", this.group_nogui);
     },
     group_nogui(r) {
-      if (!this.chat_list.includes(r["id"])) {
-        this.chat_list.push(r["id"]);
+      if (this.current_chat !== null && this.current_chat.id == r["groupid"]) {
+        this.group_gui(r);
+      } else {
+        console.log("NOGUI");
+        if (!this.chat_list.includes(r["groupid"])) {
+          this.chat_list.push(r["groupid"]);
+        }
       }
     },
     list_join_group(c) {
-      this.$root.s.on("new_group", this.group_gui);
+      this.$root.s.off("update_group", this.group_nogui);
+      this.$root.s.on("update_group", this.group_gui);
       this.$root.s.emit("join_group", { groupid: c.id, sender: this.id });
+    },
+    group_delete(c) {
+      if (!this.chat_list.includes(c.groupid)) {
+        return;
+      }
+      if (this.current_chat !== null && this.current_chat.id === c.groupid) {
+        this.quit_chat(null);
+      } else {
+        delete this.chat_message[c.groupid];
+        this.chat_message = { ...this.chat_message };
+        console.log("brefore", this.chat_list);
+
+        this.chat_list.splice(this.chat_list.indexOf(c.groupid), 1);
+        console.log("after", this.chat_list);
+      }
     },
     join_chat(c) {
       this.current_chat = {};
@@ -280,18 +302,7 @@ export default {
       // delete names[this.id];
       names = Object.values(names);
       if (names.length > 1) {
-        // if (chosen) {
-        // return (
-        //   "(" +
-        //   (names.length + 1) +
-        //   ") " +
-        //   names.join(", ") +
-        //   ", " +
-        //   this.username
-        // );
-        // } else {
         return "(" + names.length + ") " + names.join(", ");
-        // }
       }
       return names[0];
     },
@@ -304,30 +315,31 @@ export default {
       var newObj = {};
       newObj["sender"] = s;
       newObj["message"] = mm;
+      newObj["name"] = this.contact_list.person[s][s];
       if (m.receiver.length === 20 && m.sender !== this.id) {
         if (!this.chat_list.includes(m.sender)) {
           this.chat_list.push(m.sender);
         }
         if (this.chat_message[m.sender] === undefined) {
-          this.$set(this.chat_message, m.sender, []); //[m.receiver] = [];
+          this.chat_message[m.sender] = []; //[m.receiver] = [];
         }
         this.chat_message[m.sender].push(newObj);
+        this.chat_message = { ...this.chat_message };
       } else {
         if (!this.chat_list.includes(m.receiver)) {
           this.chat_list.push(m.receiver);
         }
         if (this.chat_message[m.receiver] === undefined) {
-          this.$set(this.chat_message, m.receiver, []); //[m.receiver] = [];
+          this.chat_message[m.receiver] = []; //[m.receiver] = [];
         }
         this.chat_message[m.receiver].push(newObj);
+        this.chat_message = { ...this.chat_message };
       }
     },
     quit_chat(q) {
       delete this.chat_message[this.current_chat.id];
       this.chat_message = { ...this.chat_message };
-      this.chat_list = this.chat_list.filter(
-        (item) => item !== this.current_chat.id
-      );
+      this.chat_list.splice(this.chat_list.indexOf(this.current_chat.id), 1);
       this.current_chat = q;
     },
     resize() {

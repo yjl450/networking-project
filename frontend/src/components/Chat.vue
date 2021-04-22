@@ -20,7 +20,7 @@
             >
 
             <md-menu-content>
-              <md-menu-item @click="join_confirm = true" v-if="current_chat"
+              <md-menu-item @click="join_confirm = true" v-if="current_chat && current_chat.id.length === 20"
                 >Create Group</md-menu-item
               >
               <md-menu-item v-if="current_chat" @click="leave = true"
