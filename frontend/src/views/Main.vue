@@ -143,6 +143,10 @@ export default {
     // window.addEventListener("beforeunload", this.preventRefresh);
   },
   mounted() {
+    window.onbeforeunload = () => {
+      this.close_app();
+      return undefined;
+    };
     this.resize();
     window.onresize = this.resize;
     this.contact_list = this.$root.contact;
@@ -151,6 +155,20 @@ export default {
       this.contact_list = {};
       this.contact_list.person = r["person"];
       this.contact_list.group = r["group"];
+      for (let i = 0; i < this.chat_list.length; i++) {
+        if (
+          !(this.chat_list[i] in this.contact_list.person) &&
+          !(this.chat_list[i] in this.contact_list.group)
+        ) {
+          if (this.chat_message[this.chat_list[i]]) {
+            delete this.chat_message[this.chat_list[i]];
+          }
+          if (this.current_chat.id === this.chat_list[i]) {
+            this.current_chat = null;
+          }
+          this.chat_list.splice(i, 1);
+        }
+      }
     });
     this.$root.s.on("message", (r) => {
       this.new_message(r);
@@ -158,9 +176,9 @@ export default {
     this.$root.s.on("update_group", this.group_nogui);
     this.$root.s.on("delete_group", this.group_delete);
   },
-  beforeDestroy() {
-    this.close_app();
-  },
+  // beforeDestroy() {
+  //   this.close_app("");
+  // },
   computed: {
     current_messages() {
       if (
@@ -387,6 +405,7 @@ export default {
         this.$root.contact = {};
         this.$root.s = null;
       }
+      return "";
     },
   },
 };

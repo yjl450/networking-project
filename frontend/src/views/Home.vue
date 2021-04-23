@@ -89,6 +89,7 @@ export default {
       // Send username to server, get user id, redirect to chatting page
       this.validate();
       if (this.$root.s === null) {
+        console.log(process.env.VUE_APP_BASE_API)
         this.$root.s = io(process.env.VUE_APP_BASE_API);
       }
       this.$root.s.on("login-response", (r) => {

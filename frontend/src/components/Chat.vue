@@ -261,7 +261,7 @@ export default {
       this.join_confirm = false;
     },
     logout_confirm() {
-      this.$router.push("/");
+      this.$router.go("/");
       this.logout = false;
     },
     leave_confirm() {
