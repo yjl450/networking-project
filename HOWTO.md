@@ -12,4 +12,4 @@ Frontend pages have been built already in `frontend/dist/`. However, you can bui
     yarn # install dependencies
     yarn build
 
-This requires Node.js and a package manager, yarn of npm.
+This requires Node.js and a package manager, yarn or npm.
