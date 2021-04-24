@@ -1,9 +1,16 @@
 # Computer Networking Midterm Project
-[![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
-[![forthebadge](https://forthebadge.com/images/badges/made-with-vue.svg)](https://forthebadge.com)
-[![forthebadge](https://forthebadge.com/images/badges/not-a-bug-a-feature.svg)](https://forthebadge.com)
 
-By Yijian Liu (@yjl450), Leyi Sun
+By Yijian Liu (yjl450), Leyi Sun (ls4571)
+
+# Launch
+
+    $ python backend/server.py
+
+This will launch the server and hosting the pre-built frontend files. The server requires dependencies: Flask, Flask-Socketio, which can be installed by running
+
+    $ pip install flask flask-socketio
+
+# Project Structure
 
 # Communication Format
 update: "action" field is changed to the event name of SocketIO and Flask-SocketIO
