@@ -1,16 +1,32 @@
 # Computer Networking Midterm Project
 
 By Yijian Liu (yjl450), Leyi Sun (ls4571)
-
-# Launch
-
-    $ python backend/server.py
-
-This will launch the server and hosting the pre-built frontend files. The server requires dependencies: Flask, Flask-Socketio, which can be installed by running
-
-    $ pip install flask flask-socketio
-
 # Project Structure
+https://github.com/yjl450/networking-project
+
+        ├── backend/
+        │ └─ server.py (Server File)
+        ├── frontend/
+        │ ├── dist/ (Pre-built Frontend Files)
+        │ │ ├── css/
+        │ │ ├── js/
+        │ │ └── index.html
+        │ ├── public/ (Vue Entry HTML File)
+        │ │ └── index.html
+        │ ├── src/ (Vue Components and SOurce Codes)
+        │ │ ├── assets/ (Emoji Description)
+        │ │ ├── components/
+        │ │ │ ├── Bubble.vue
+        │ │ │ └── Chat.vue ()
+        │ │ ├── router/
+        │ │ │ └── index.js
+        │ │ ├── views/
+        │ │ │ ├── Home.vue (Login Page)
+        │ │ │ └── Main.vue (Main Chat Page)
+        │ │ ├── App.vue
+        │ │ └── main.js
+        │ └── README.md (Instruction for Vue dev server and building)
+        └── README.md (This File)
 
 # Communication Format
 update: "action" field is changed to the event name of SocketIO and Flask-SocketIO
