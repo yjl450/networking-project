@@ -80,16 +80,19 @@ export default {
     validate() {
       if (this.name === "") {
         this.validationMessage = "Please enter a username.";
-        return;
+        return false;
       } else {
         this.validationMessage = "";
+        return true;
       }
     },
     submit() {
       // Send username to server, get user id, redirect to chatting page
-      this.validate();
+      if (!this.validate()) {
+        return;
+      }
       if (this.$root.s === null) {
-        console.log(process.env.VUE_APP_BASE_API)
+        console.log(process.env.VUE_APP_BASE_API);
         this.$root.s = io(process.env.VUE_APP_BASE_API);
       }
       this.$root.s.on("login-response", (r) => {
