@@ -1,9 +1,9 @@
 # Computer Networking Midterm Project
 
 By Yijian Liu (yjl450), Leyi Sun (ls4571)
-# Project Structure
-https://github.com/yjl450/networking-project
 
+https://github.com/yjl450/networking-project
+# Project Structure
         ├── backend/
         │ └─ server.py (Server File)
         ├── frontend/
@@ -28,7 +28,7 @@ https://github.com/yjl450/networking-project
         │ └── README.md (Instruction for Vue building)
         ├── HOWTO.md (Instruction for running the server)
         └── README.md (This File)
-
+Some files for Webpack and dev/production environment variables are ignored in this chart.
 # Communication Format
 update: "action" field is changed to the event name of SocketIO and Flask-SocketIO
 
