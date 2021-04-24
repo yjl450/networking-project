@@ -25,7 +25,8 @@ https://github.com/yjl450/networking-project
         │ │ │ └── Main.vue (Main Chat Page)
         │ │ ├── App.vue
         │ │ └── main.js
-        │ └── README.md (Instruction for Vue dev server and building)
+        │ └── README.md (Instruction for Vue building)
+        ├── HOWTO.md (Instruction for running the server)
         └── README.md (This File)
 
 # Communication Format
