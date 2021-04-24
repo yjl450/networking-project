@@ -9,11 +9,11 @@ app = Flask(__name__,
             static_url_path="",
             template_folder="../frontend/dist")
 app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app,cors_allowed_origins='*')
+socketio = SocketIO(app, cors_allowed_origins='*')
 # , async_mode="threading")
 
 user = {}  # mapping from userid (socketid) to username
-rooms = {1234123489: {1: "gaogao", 2: "ee", 3: "diyu"}}  # mapping from room name (room_id) to dict of
+rooms = {}  # mapping from room name (room_id) to dict of
 """
 user = {userid: {userid: username}}
 rooms = {room1: {user1: username, user2: username, ...}, 
@@ -29,7 +29,7 @@ jinja_options.update(dict(
 
 # Maintain a length of 10
 def unique_room(sender_id):
-    room_name = str(hash(str(time()+sender_id)))[:10]
+    room_name = str(hash(str(time())+sender_id))[:10]
     if room_name in rooms.keys():
         return unique_room(sender_id)
     return room_name
@@ -41,24 +41,32 @@ def index():
 
 
 def contact_update():
+    # print({"person": user, "group": rooms})
     emit("contact", {"person": user, "group": rooms}, broadcast=True)
+
+
+def dup_check(name):
+    for v in user.values():
+        if name in v.values():
+            return True
+    return False
 
 
 @socketio.on('login')
 def login(message):
     result = ""
-    print("RECV:", request.sid, message)
-    print("SEND:", {'username': message['username'], "userid": request.sid})
+    # print("RECV:", request.sid, message)
+    # print("SEND:", {'username': message['username'], "userid": request.sid})
     # validation
-    if message["username"] in user.values():
+    if dup_check(message["username"]):
         result = "duplicate"
         emit('login-response',
-            {'username': message['username'], "result": result, "userid": request.sid})
+             {'username': message['username'], "result": result, "userid": request.sid})
     else:
         result = "success"
-        user[request.sid] = {request.sid:message["username"]}
+        user[request.sid] = {request.sid: message["username"]}
         emit('login-response',
-            {'username': message['username'], "result": result, "userid": request.sid})
+             {'username': message['username'], "result": result, "userid": request.sid})
         contact_update()
 
 
@@ -69,12 +77,13 @@ def send_message(message):
       "receiver": *groupid*, 
       "message": *content*}
     """
-    print({"sender": message["sender"], "receiver": message["receiver"], "message": message["message"]})
+    # print({"sender": message["sender"],
+    #        "receiver": message["receiver"], "message": message["message"]})
     emit("message",
-         {"sender": message["sender"], "receiver": message["receiver"], "message": message["message"]},
+         {"sender": message["sender"], "receiver": message["receiver"],
+             "message": message["message"]},
          skip_sid=message["sender"],
          to=message["receiver"])
-
 
 
 @socketio.on("create_group")
@@ -85,14 +94,13 @@ def create_group(message):
     """
     group_id = unique_room(message["sender"])
     rooms[group_id] = message["member"]
-    join_room(group_id)
     for other in message["member"].keys():
         join_room(group_id, sid=other)
-    emit('create-group', 
+    emit('update_group',
          {"groupid": group_id, "member": message["member"]},
          to=group_id)
     contact_update()
-    print(rooms)
+    # print(rooms)
 
 
 @socketio.on("join_group")
@@ -104,13 +112,13 @@ def join_group(message):
     groupid, userid = message["groupid"], message["sender"]
     username = user[userid][userid]
     rooms[groupid][userid] = username
-    join_room(groupid)
-    emit('new-member', 
-         {"groupid": groupid, "member": message["sender"]},
+    join_room(groupid, sid=userid)
+    # print()
+    emit('update_group',
+         {"groupid": groupid, "member": rooms[groupid]},
          to=groupid)
     contact_update()
-    print(rooms)
-    
+    # print(rooms)
 
 
 @socketio.on("leave_group")
@@ -121,11 +129,15 @@ def leave_group(message):
     """
     group_id = message["groupid"]
     del rooms[group_id][message["sender"]]
-    
-    for k, v in rooms.items():
-        if len(v) <= 1: # 
-            del rooms[k]
-    leave_room(group_id)
+    if len(rooms[group_id]) <= 2:
+        del rooms[group_id]
+        emit('delete_group', {"groupid": group_id}, to=group_id)
+        leave_room(group_id)
+    else:
+        leave_room(group_id)
+        emit('update_group',
+             {"groupid": group_id, "member": rooms[group_id]},
+             to=group_id)
     contact_update()
 
 
@@ -134,17 +146,53 @@ def logout(message):
     """
     {"sender": *userid*}
     """
-    del user[message["sender"]]
-    for v in rooms.values():
-        if message["sender"] in v.keys():
-            del v[message["sender"]]
-    
-    for k, v in rooms.items():
-        if len(v) <= 1: # 
-            del rooms[k]
+    # print("LOGOUT:", message)
+    uid = request.sid
+    if (user[uid]):
+        del user[uid]
+    for k in list(rooms.keys()):
+        v = rooms[k]
+        if uid in v.keys():
+            del v[uid]
+            if len(v) <= 2:
+                emit('delete_group', {"groupid": k}, to=k)
+                del rooms[k]
+                try:
+                    leave_room(k, sid=uid)
+                except:
+                    pass
+            else:
+                try:
+                    leave_room(k, sid=uid)
+                except:
+                    pass
+                emit('update_group',
+                     {"groupid": k, "member": v},
+                     to=k)
     contact_update()
-    
-    
+
+@socketio.on("disconnect")
+def after_disconnect(reason=""):
+    """
+    {"sender": *userid*}
+    """
+    # print("Disconnect:", reason)
+    uid = request.sid
+    if (uid in user.keys()):
+        del user[uid]
+    for k in list(rooms.keys()):
+        v = rooms[k]
+        if uid in v.keys():
+            del v[uid]
+            if len(v) <= 2:
+                emit('delete_group', {"groupid": k}, to=k)
+                del rooms[k]
+            else:
+                emit('update_group',
+                     {"groupid": k, "member": v},
+                     to=k)
+    contact_update()
+
 
 if __name__ == '__main__':
     socketio.run(app)
