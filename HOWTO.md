@@ -2,7 +2,9 @@
 
     $ python backend/server.py
 
-This will launch the server and hosting the pre-built frontend files. The server requires dependencies: Flask, Flask-Socketio, which can be installed by running
+This will launch the server at `localhost:5000` and hosting the pre-built frontend files.
+
+The server requires dependencies: Flask, Flask-Socketio, which can be installed by running
 
     $ pip install flask flask-socketio
 
