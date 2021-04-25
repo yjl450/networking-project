@@ -148,7 +148,7 @@ def logout(message):
     """
     # print("LOGOUT:", message)
     uid = request.sid
-    if (user[uid]):
+    if (uid in user.keys()):
         del user[uid]
     for k in list(rooms.keys()):
         v = rooms[k]
