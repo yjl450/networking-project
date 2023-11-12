@@ -2,7 +2,6 @@
 
 By Yijian Liu (yjl450), Leyi Sun (ls4571)
 
-This project is currently running at [convo.tk](http://convo.tk/).
 
 Github: https://github.com/yjl450/networking-project
 # Project Structure
